@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+//(X) Publicar en github: git push https://github.com/Legend27RV/Semantica
 //(X) Requerimiento 1.- Eliminar las dobles comillas del printf e interpretar las secuencias de escape
 //                      dentro de la cadena
 //(X) Requerimiento 2.- Marcar los errores sintacticos cuando la variable no exista
@@ -66,6 +67,17 @@ namespace Semantica
                 }
             }
             return 0;
+        }
+        private Variable.TipoDato getTipo(string nombre)
+        {
+            foreach(Variable v in variables)
+            {
+                if (v.getTipo().Equals(nombre))
+                {
+                    return v.getTipo();
+                }
+            }
+            return Variable.TipoDato.Char;
         }
         //Programa -> Librerias? Variables? Main
         public void Programa()
@@ -194,6 +206,29 @@ namespace Semantica
             {
                 Asignacion();
             }
+        }
+        private Variable.TipoDato evaluaNumero(float resultado)
+        {
+            if(resultado<=255)
+            {
+                return Variable.TipoDato.Char;
+            }
+            else if(resultado<=65535)
+            {
+                return Variable.TipoDato.Int;
+            }
+            else
+            {
+                return Variable.TipoDato.Float;
+            }
+            return Variable.TipoDato.Char;
+        }
+        private bool evaluaSemantica(string variable, float resultado)
+        {
+            Variable.TipoDato tipoDato = getTipo(variable);
+
+            //sacar el tipo de dato de la variable
+            return false;
         }
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion()
