@@ -1,3 +1,4 @@
+/*Rodríguez Villicaña Leonardo*/
 namespace Semantica
 {
     public class Variable

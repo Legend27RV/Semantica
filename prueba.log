@@ -1,9 +1,6 @@
+/*Rodríguez Villicaña Leonardo*/
 Archivo: prueba.cpp
-23/09/2022 09:36:46 a. m.
-3 5 + 10 Variables: 
-area Float 0
-radio Float 0
-pi Float 0
-resultado Float 0
-d Int 0
-x Char 0
+23/09/2022 10:09:24 a. m.
+
+x = 1.5 = 1.5
+Error de semantica: no podemos asignar un: <Float> a un <Char> en linea  10
