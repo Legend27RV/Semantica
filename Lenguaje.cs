@@ -15,6 +15,9 @@ using System.Collections.Generic;
 //( ) Requerimiento 2.3.- Programar un metodo de conversion de un valor a un tipo de dato
 //                        Ejemplo: private float convert(float valor, string TipoDato)
 //                        Deberan usar el residuo de la division %255, %65535
+//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else, while, for, do while  
+//                        con respecto al parametro que recibe
+//( ) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -153,6 +156,15 @@ namespace Semantica
                 Lista_identificadores(tipo);
             }
         }
+        //Main      -> void main() Bloque de instrucciones
+        private void Main()
+        {
+            match("void");
+            match("main");
+            match("(");
+            match(")");
+            BloqueInstrucciones(true);
+        }
         //Bloque de instrucciones -> {listaIntrucciones?}
         private void BloqueInstrucciones(bool evaluacion)
         {
@@ -222,11 +234,11 @@ namespace Semantica
             if(resultado % 1 != 0){
                 return Variable.TipoDato.Float;
             }
-            else if(resultado<=255)
+            else if(resultado <= 255)
             {
                 return Variable.TipoDato.Char;
             }
-            else if(resultado<=65535)
+            else if(resultado <= 65535)
             {
                 return Variable.TipoDato.Int;
             }
@@ -286,15 +298,17 @@ namespace Semantica
         {
             match("while");
             match("(");
-            Condicion();
+            //Requerimiento 2.4
+            /*-->*/bool validarWhile = Condicion();
+            //que dependiendo de la condicion se ejecute o no el bloque de instrucciones o la instruccion
             match(")");
             if(getContenido() == "{") 
             {
-                BloqueInstrucciones(evaluacion);
+                BloqueInstrucciones(validarWhile);
             }
             else
             {
-                Instruccion(evaluacion);
+                Instruccion(validarWhile);
             }
         }
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
@@ -311,7 +325,8 @@ namespace Semantica
             } 
             match("while");
             match("(");
-            Condicion();
+            //Requerimiento 2.4 
+            bool validarDo = Condicion();
             match(")");
             match(";");
         }
@@ -321,7 +336,8 @@ namespace Semantica
             match("for");
             match("(");
             Asignacion(evaluacion);
-            Condicion();
+            //Requerimiento 2.4
+            bool validarFor = Condicion();
             match(";");
             Incremento(evaluacion);
             match(")");
@@ -437,6 +453,7 @@ namespace Semantica
         {
             match("if");
             match("(");
+            //Requerimiento 2.4
             bool validaIf = Condicion();
             match(")");
             if (getContenido() == "{")
@@ -450,13 +467,14 @@ namespace Semantica
             if (getContenido() == "else")
             {
                 match("else");
+                //Requerimiento 2.4
                 if (getContenido() == "{")
                 {
-                    BloqueInstrucciones(validaIf);
+                    BloqueInstrucciones(!validaIf);
                 }
                 else
                 {
-                    Instruccion(validaIf);
+                    Instruccion(!validaIf);
                 }
             }
         }
@@ -481,7 +499,7 @@ namespace Semantica
                 float resultado = stack.Pop();
                 if(evaluacion)
                 {
-                    Console.Write(stack.Pop());
+                    Console.Write(resultado);
                 }
             }
             match(")");
@@ -497,10 +515,16 @@ namespace Semantica
             match("&");
             if(existeVariable(getContenido()))
             {
-                string val=""+Console.ReadLine();
                 string nombre=getContenido();
-                modVariable(nombre,float.Parse(val));
                 match(Tipos.Identificador);
+                if(evaluacion)
+                {
+                    string val=""+Console.ReadLine();
+                    //if(val!=texto){haz el float, si no haz la excepcion}
+                    //Requerimiento 2.5
+                    float valorFloat = float.Parse(val);
+                    modVariable(nombre,valorFloat);
+                }
                 match(")");
                 match(";");
             }
@@ -508,15 +532,6 @@ namespace Semantica
             {
                 throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
             }
-        }
-        //Main      -> void main() Bloque de instrucciones
-        private void Main()
-        {
-            match("void");
-            match("main");
-            match("(");
-            match(")");
-            BloqueInstrucciones(true);
         }
         //Expresion -> Termino MasTermino
         private void Expresion()

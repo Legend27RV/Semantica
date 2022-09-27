@@ -7,8 +7,7 @@ int d;
 char x;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    if(3+5<10){
-        printf("Tlaxcala")
+    if(3+5>10){
+        printf("Tlaxcala");
     }
-
 }
