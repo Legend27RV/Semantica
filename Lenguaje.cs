@@ -15,9 +15,10 @@ using System.Collections.Generic;
 //( ) Requerimiento 2.3.- Programar un metodo de conversion de un valor a un tipo de dato
 //                        Ejemplo: private float convert(float valor, string TipoDato)
 //                        Deberan usar el residuo de la division %255, %65535
-//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else, while, for, do while  
+//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while( ), for( ), do while( )  
 //                        con respecto al parametro que recibe
 //( ) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
+//( ) Requerimiento 2.6.- Ejecutar el for();
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -337,18 +338,26 @@ namespace Semantica
             match("(");
             Asignacion(evaluacion);
             //Requerimiento 2.4
+            //Requerimiento 2.6:
+            //a) Necesito guardar la posicion del archivo para poder regresar a ella con la variable int
             bool validarFor = Condicion();
-            match(";");
-            Incremento(evaluacion);
-            match(")");
-            if (getContenido() == "{")
-            {
-                BloqueInstrucciones(evaluacion);  
-            }
-            else
-            {
-                Instruccion(evaluacion);
-            }
+            //b) Metemos un ciclo while despues del valida for 
+            // while()
+            // {
+                match(";");
+                Incremento(evaluacion);
+                match(")");
+                if (getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion);  
+                }
+                else
+                {
+                    Instruccion(evaluacion);
+                }
+                //c) regresar a la posicion del archivo
+                //d) sacar otro token
+            // }
         }
         //Incremento -> Identificador ++ | --
         private void Incremento(bool evaluacion)
@@ -607,6 +616,10 @@ namespace Semantica
                 if(existeVariable(getContenido()))
                 {
                     log.Write(getContenido() + " " );
+                    if (dominante < getTipo(getContenido()))
+                    {
+                        dominante = getTipo(getContenido());
+                    }
                     //Requerimiento 2.1 estilo linea 535 - 538
                     stack.Push(getValor(getContenido()));
                     match(Tipos.Identificador);

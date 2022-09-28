@@ -9,5 +9,7 @@ char x;
 void main(){
     if(3+5>10){
         printf("Tlaxcala");
+    }else{
+        printf("Tlaxcalan´t");
     }
 }
