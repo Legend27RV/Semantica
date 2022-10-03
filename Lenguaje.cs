@@ -12,12 +12,12 @@ using System.Collections.Generic;
 //( ) Requerimiento 2.1.- Actualizar el dominante para variables en la expresion
 //                        Ejemplo: float x; char y; y=x;
 //( ) Requerimiento 2.2.- Actualizar el dominante para el casteo y el valor de la subexpresion
-//( ) Requerimiento 2.3.- Programar un metodo de conversion de un valor a un tipo de dato
+//(X) Requerimiento 2.3.- Programar un metodo de conversion de un valor a un tipo de dato
 //                        Ejemplo: private float convert(float valor, string TipoDato)
 //                        Deberan usar el residuo de la division %255, %65535
-//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while( ), for( ), do while( )  
+//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while(X), for( ), do while(X)  
 //                        con respecto al parametro que recibe
-//( ) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
+//(X) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 //( ) Requerimiento 2.6.- Ejecutar el for();
 namespace Semantica
 {
@@ -92,6 +92,26 @@ namespace Semantica
                 }
             }
             return Variable.TipoDato.Char;
+        }
+        //Requerimiento 2.3: Programar un metodo de conversion de un valor a un tipo de dato
+        private float convValor(float valor, string TipoDato)
+        {
+            if (TipoDato.Equals("char"))
+            {
+                return valor % 255;
+            }
+            else if (TipoDato.Equals("int"))
+            {
+                return valor % 65535;
+            }
+            else if (TipoDato.Equals("float"))
+            {
+                return valor;
+            }
+            else
+            {
+                return 0;
+            }
         }
         //Programa -> Librerias? Variables? Main
         public void Programa()
@@ -531,7 +551,15 @@ namespace Semantica
                     string val=""+Console.ReadLine();
                     //if(val!=texto){haz el float, si no haz la excepcion}
                     //Requerimiento 2.5
-                    float valorFloat = float.Parse(val);
+                    try{
+                        float y=0;
+                        y = float.Parse(val);
+                    }
+                    catch
+                    {
+                        throw new Error("Error de sintaxis, el valor no es un numero <" +val+"> en linea: "+linea, log);
+                    }
+                    float valorFloat=float.Parse(val);
                     modVariable(nombre,valorFloat);
                 }
                 match(")");
@@ -621,7 +649,14 @@ namespace Semantica
                         dominante = getTipo(getContenido());
                     }
                     //Requerimiento 2.1 estilo linea 535 - 538
-                    stack.Push(getValor(getContenido()));
+                    if (getClasificacion() == Tipos.TipoDato)
+                    {
+                        log.Write(getContenido() + " " );
+                        stack.Push(float.Parse(getContenido()));
+                        match(Tipos.TipoDato);
+                    }
+                    //Fin requerimiento 2.1
+                    //stack.Push(getValor(getContenido()));
                     match(Tipos.Identificador);
                 }
                 else
