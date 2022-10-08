@@ -1,9 +1,5 @@
 Archivo: prueba.cpp
-03/10/2022 09:54:57 a. m.
-5 10 Variables: 
-area Float 0
-radio Float 0
-pi Float 0
-resultado Float 0
-d Int 0
-x Char 0
+06/10/2022 10:37:12 a. m.
+
+i = altura = 6545
+Error de semantica: no podemos asignar un: <Int> a un <Char> en linea  17

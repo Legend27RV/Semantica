@@ -15,7 +15,7 @@ using System.Collections.Generic;
 //(X) Requerimiento 2.3.- Programar un metodo de conversion de un valor a un tipo de dato
 //                        Ejemplo: private float convert(float valor, string TipoDato)
 //                        Deberan usar el residuo de la division %255, %65535
-//( ) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while(X), for( ), do while(X)  
+//(Falta el for,2.6) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while(X), for( ), do while(X)  
 //                        con respecto al parametro que recibe
 //(X) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 //( ) Requerimiento 2.6.- Ejecutar el for();
@@ -94,17 +94,17 @@ namespace Semantica
             return Variable.TipoDato.Char;
         }
         //Requerimiento 2.3: Programar un metodo de conversion de un valor a un tipo de dato
-        private float convValor(float valor, string TipoDato)
+        private float convValor(float valor, string tipoDato)
         {
-            if (TipoDato.Equals("char"))
+            if (tipoDato.Equals("int"))
             {
-                return valor % 255;
+                return valor % 65536;
             }
-            else if (TipoDato.Equals("int"))
+            else if (tipoDato.Equals("char"))
             {
-                return valor % 65535;
+                return valor % 256;
             }
-            else if (TipoDato.Equals("float"))
+            else if (tipoDato.Equals("float"))
             {
                 return valor;
             }
@@ -147,8 +147,12 @@ namespace Semantica
                 Variable.TipoDato tipo = Variable.TipoDato.Char; 
                 switch (getContenido())
                 {
-                    case "int": tipo = Variable.TipoDato.Int; break;
-                    case "float": tipo = Variable.TipoDato.Float; break;
+                    case "int": 
+                        tipo = Variable.TipoDato.Int; 
+                        break;
+                    case "float": 
+                        tipo = Variable.TipoDato.Float; 
+                        break;
                 }
                 match(Tipos.TipoDato);
                 Lista_identificadores(tipo);
@@ -252,10 +256,7 @@ namespace Semantica
         }
         private Variable.TipoDato evaluaNumero(float resultado)
         {
-            if(resultado % 1 != 0){
-                return Variable.TipoDato.Float;
-            }
-            else if(resultado <= 255)
+            if(resultado <= 255)
             {
                 return Variable.TipoDato.Char;
             }
@@ -305,6 +306,7 @@ namespace Semantica
                 }
                 else
                 {
+                    Console.WriteLine(nombre+"\t"+getTipo(nombre)+"\t"+dominante);
                     throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
                 }
             }
@@ -321,6 +323,9 @@ namespace Semantica
             match("(");
             //Requerimiento 2.4
             /*-->*/bool validarWhile = Condicion();
+            if(!evaluacion){
+                validarWhile = false;
+            }
             //que dependiendo de la condicion se ejecute o no el bloque de instrucciones o la instruccion
             match(")");
             if(getContenido() == "{") 
@@ -348,6 +353,9 @@ namespace Semantica
             match("(");
             //Requerimiento 2.4 
             bool validarDo = Condicion();
+            if(!evaluacion){
+                validarDo = false;
+            }
             match(")");
             match(";");
         }
@@ -361,6 +369,9 @@ namespace Semantica
             //Requerimiento 2.6:
             //a) Necesito guardar la posicion del archivo para poder regresar a ella con la variable int
             bool validarFor = Condicion();
+            if(!evaluacion){
+                validarFor = false;
+            }
             //b) Metemos un ciclo while despues del valida for 
             // while()
             // {
@@ -484,6 +495,9 @@ namespace Semantica
             match("(");
             //Requerimiento 2.4
             bool validaIf = Condicion();
+            if(!evaluacion){
+                validaIf = false;
+            }
             match(")");
             if (getContenido() == "{")
             {
@@ -496,6 +510,9 @@ namespace Semantica
             if (getContenido() == "else")
             {
                 match("else");
+                if(evaluacion == false){
+                    validaIf = true;
+                }
                 //Requerimiento 2.4
                 if (getContenido() == "{")
                 {
@@ -644,19 +661,9 @@ namespace Semantica
                 if(existeVariable(getContenido()))
                 {
                     log.Write(getContenido() + " " );
-                    if (dominante < getTipo(getContenido()))
-                    {
-                        dominante = getTipo(getContenido());
-                    }
-                    //Requerimiento 2.1 estilo linea 535 - 538
-                    if (getClasificacion() == Tipos.TipoDato)
-                    {
-                        log.Write(getContenido() + " " );
-                        stack.Push(float.Parse(getContenido()));
-                        match(Tipos.TipoDato);
-                    }
+                    //Requerimiento 2.1: Actualizar el dominante para variables en la expresion
                     //Fin requerimiento 2.1
-                    //stack.Push(getValor(getContenido()));
+                    stack.Push(getValor(getContenido()));
                     match(Tipos.Identificador);
                 }
                 else
@@ -695,8 +702,11 @@ namespace Semantica
                 if(huboCasteo)
                 {
                     //Requerimiento 2.2
+                    dominante=casteo;
                     //saco un elemento del stack
+                    float dato = stack.Pop();
                     //convierto ese valor al equivalente en casteo
+                    stack.Push(convValor(dato,casteo.ToString()));
                     //Requerimiento 2.3
                     //Ejemplo: si el casteo es char y el pop regresa un 256
                     //         el valor equivalente en casteo es 0
