@@ -1,4 +1,4 @@
-//Gabriel Morales Nuñez
+//Rodriguez Villicaña Leonardo
 #include <iostream>
 #include <stdio.h>
 #include <conio.h>
@@ -9,6 +9,7 @@ char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
     //Requerimiento 5.- Levanta una excepcion en el scanf si la captura no es un numero
+    
     printf("Introduce la altura de la piramide: ");
     scanf("altura", &altura);
     //Requerimiento 6.- Ejecutar el for y for anidado
