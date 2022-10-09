@@ -18,7 +18,7 @@ using System.Collections.Generic;
 //(X) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while(X), for(X), do while(X)  
 //                        con respecto al parametro que recibe
 //(X) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
-//(x) Requerimiento 2.6.- Ejecutar el for();
+//(x) Requerimiento 2.6.- Ejecutar el for(X);
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -84,7 +84,7 @@ namespace Semantica
         {
             foreach(Variable v in variables)
             {
-                if (v.getTipo().Equals(nombre))
+                if (v.getNombre().Equals(nombre))
                 {
                     return v.getTipo();
                 }
@@ -275,6 +275,7 @@ namespace Semantica
                 string nombre = getContenido();
                 match(Tipos.Identificador);
                 match(Tipos.Asignacion);
+                dominante = Variable.TipoDato.Char;
                 Expresion();
                 match(";");
                 float resultado = stack.Pop();
@@ -293,7 +294,6 @@ namespace Semantica
                 }
                 else
                 {
-                    Console.WriteLine(nombre+"\t"+getTipo(nombre)+"\t"+dominante);
                     throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
                 }
             }
@@ -713,7 +713,7 @@ namespace Semantica
                     //saco un elemento del stack
                     float dato = stack.Pop();
                     //convierto ese valor al equivalente en casteo
-                    stack.Push(convValor(dato,dominante));
+                    stack.Push(convValor(dato,casteo));
                     //Requerimiento 2.3
                     //Ejemplo: si el casteo es char y el pop regresa un 256
                     //         el valor equivalente en casteo es 0
