@@ -18,7 +18,7 @@ using System.Collections.Generic;
 //(X) Requerimiento 2.4.- Evaluar nuevamente la condicion del if - else(X), while(X), for(X), do while(X)  
 //                        con respecto al parametro que recibe
 //(X) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
-//(x) Requerimiento 2.6.- Ejecutar el for(X);
+//(x) Requerimiento 2.6.- Ejecutar el for();
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -58,7 +58,6 @@ namespace Semantica
             }
             return false;
         }
-        //Requisito 3: Modificar el valor de la variable en la asignacion
         private void modVariable(string nombre, float nuevoValor)
         {
             foreach(Variable v in variables)
@@ -261,7 +260,6 @@ namespace Semantica
         private bool evaluaSemantica(string variable, float resultado)
         {
             Variable.TipoDato tipoDato = getTipo(variable);
-
             //sacar el tipo de dato de la variable
             return false;
         }
@@ -301,7 +299,6 @@ namespace Semantica
             {
                 throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
             }
-            
         }
         //While -> while(Condicion) bloque de instrucciones | instruccion
         private void While(bool evaluacion)
@@ -354,23 +351,24 @@ namespace Semantica
             match("for");
             match("(");
             Asignacion(evaluacion);
-            //Requerimiento 2.4
             //Requerimiento 2.6:
             //a) Necesito guardar la posicion del archivo para poder regresar a ella con la variable int
             int posisionInit = posicion;
             int lineaInit = linea;
             int tamanio = getContenido().Length;
-            bool validarFor;
-            //b) Metemos un ciclo while despues del valida for 
+            string variable = getContenido();
+            bool validarFor,incremento;
+            //b) Metemos un ciclo do while despues del valida for 
             do
             {
+                //Requerimiento 2.4
                 validarFor = Condicion();
                 if(!evaluacion)
                 {
                     validarFor = false;
                 }
                 match(";");
-                Incremento(validarFor);
+                incremento = Incremento(validarFor);
                 match(")");
                 if (getContenido() == "{")
                 {
@@ -382,6 +380,14 @@ namespace Semantica
                 }
                 if(validarFor)
                 {
+                    if(incremento)
+                    {
+                        modVariable(variable, getValor(variable) + 1);
+                    }
+                    else
+                    {
+                        modVariable(variable, getValor(variable) - 1);
+                    }
                     //c) regresar a la posicion del archivo
                     posicion = posisionInit-tamanio;
                     linea = lineaInit;
@@ -393,34 +399,37 @@ namespace Semantica
             }while(validarFor);
         }
         //Incremento -> Identificador ++ | --
-        private void Incremento(bool evaluacion)
+        private bool Incremento(bool evaluacion)
         {
-            string variable=getContenido();
+            //string variable=getContenido();
             if(existeVariable(getContenido()))
             {
+                string variable = getContenido();
                 match(Tipos.Identificador);
+                
                 if(getContenido() == "++")
                 {
                     match("++");
-                    if(evaluacion)
-                    {
+                    /*if(evaluacion)
+                    {   
                         modVariable(variable,getValor(variable)+1);
-                    }
+                    }*/
+                    return true;
                 }
                 else
                 {
                     match("--");
-                    if(evaluacion)
+                    /*if(evaluacion)
                     {
                         modVariable(variable,getValor(variable)-1);
-                    }
+                    }*/
+                    return false;
                 }
             }
             else
             {
                 throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
             }
-            
         }
         //Switch -> switch (Expresion) {Lista de casos} | (default: )
         private void Switch(bool evaluacion)
@@ -568,8 +577,8 @@ namespace Semantica
                 if(evaluacion)
                 {
                     string val=""+Console.ReadLine();
-                    //if(val!=texto){haz el float, si no haz la excepcion}
                     //Requerimiento 2.5
+                    //if(val!=texto){haz el float, si no haz la excepcion}
                     float y;
                     try{
                         y = float.Parse(val);
@@ -708,7 +717,7 @@ namespace Semantica
                 match(")");
                 if(huboCasteo)
                 {
-                    //Requerimiento 2.2
+                    //Requerimiento 2.2: Actualizar el dominante para el casteo y el valor de la subexpresion
                     dominante = casteo;
                     //saco un elemento del stack
                     float dato = stack.Pop();

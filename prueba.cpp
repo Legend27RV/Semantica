@@ -13,11 +13,10 @@ void main(){
     printf("Introduce la altura de la piramide: ");
     scanf("altura", &altura);
     //Requerimiento 6.- Ejecutar el for y for anidado
-    if(altura >2)
+    if(altura>2)
         for(i = altura; i > 0; i--)
         {
-        
-            for(j = 0; j < altura-i; j++){
+            for(j=0; j < altura-i; j++){
                 if(j!=2){
                     printf("*");
                 }
