@@ -8,21 +8,24 @@ float x;
 char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    //Requerimiento 5.- Levanta una excepcion en el scanf si la captura no es un numero
-    
+
+    y=255;
+    y++;
+    // ^ Debe generar error semantico
+    j=0;
     printf("Introduce la altura de la piramide: ");
     scanf("altura", &altura);
-    //Requerimiento 6.- Ejecutar el for y for anidado
     if(altura>2)
-        for(i = altura; i > 0; i--)
+        for(i = altura; i > 0; i-=2)
         {
-            for(j=0; j < altura-i; j++){
-                if(j!=2){
+            while(j < altura-i){
+                if(j%2 == 0){
                     printf("*");
                 }
                 else{
-                    printf("-");//Requerimiento 4.- evalua nuevamente los else
+                    printf("-");
                 }
+                j+=1
             }
             printf("\n");
         }
@@ -31,15 +34,15 @@ void main(){
     if(1 != 1){
         printf("Esto no se debe imprimir");
         if(2 == 2){
-            printf("Esto tampoco");     //Requerimiento 4.- evalua nuevamente los if respecto al parametro que reciben
+            printf("Esto tampoco");
         }
     }
     a = 256;
     printf("Valor de variable int a antes del casteo: ");
     printf(a);
-    y = (char)(a);  //Requerimiento 2 y 3, actualiza el dominante y convierte el valor con una funcion
+    y = (char)(a);
     printf("\nValor de variable char y despues del casteo de a: ");
     printf(y);
     printf("\nA continuacion se intenta asignar un int a un char sin usar casteo: \n");
-    y = a; //Requerimiento 1.- debe marcar error
+    y = a;
 }
