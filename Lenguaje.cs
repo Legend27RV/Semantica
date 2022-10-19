@@ -25,6 +25,10 @@ using System.Collections.Generic;
 //                       B) Agregar en Asignacion los incremetos de termino y factor
 //                       a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                       en donde el 1 puede ser cualquier expresion
+//                       C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
+//                       #libreria especiaL? contenedor?
+//                       en la clase lexico
+//( ) Requerimiento 3.2- Actualizacion la Venganza xd:
 //                       C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
 //                       D) Considerar el inciso B y C para el for
 //                       E) Hacer que funcione el do-while y el while
@@ -42,6 +46,11 @@ namespace Semantica
         public Lenguaje(string nombre) : base(nombre)
         {
 
+        }
+        ~Lenguaje()
+        {
+            Console.WriteLine("Destructor");
+            cerrar();
         }
         //public string Replace (string oldChar, string? newChar);
         private void addVariable(String nombre,Variable.TipoDato tipo)
@@ -285,7 +294,7 @@ namespace Semantica
                 if (getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
                 {
                     //Requerimiemto 3.1-B
-                    //Requerimiemto 3.1-C
+                    //Requerimiemto 3.2-C
                 }
                 else
                 {
@@ -386,7 +395,7 @@ namespace Semantica
                 }
                 match(";");
                 incremento = Incremento(validarFor);
-                //Requerimiento 3.1-D
+                //Requerimiento 3.2-D
                 match(")");
                 if (getContenido() == "{")
                 {
