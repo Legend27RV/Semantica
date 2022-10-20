@@ -7,7 +7,7 @@ namespace Semantica
     {
         protected StreamReader archivo;
         protected StreamWriter log;
-        protected StreamReader asm;
+        protected StreamWriter asm;
         const int F = -1;
         const int E = -2;
         protected int linea, posicion;
@@ -69,7 +69,10 @@ namespace Semantica
             asm.AutoFlush = true;
             //log.WriteLine("Primer constructor");
             log.WriteLine("Archivo: prueba.cpp");
-            log.WriteLine(DateTime.Now);//Requerimiento 1 Antiguo:
+            log.WriteLine("Fecha: "+DateTime.Now);
+            
+            asm.WriteLine(";Archivo: prueba.cpp");
+            asm.WriteLine(";Fecha: "+DateTime.Now);
             //Investigar como checar si un archivo existe o no existe 
             if (existencia == true)
             {
@@ -89,7 +92,6 @@ namespace Semantica
             string pathlog = Path.ChangeExtension(nombre, ".log");
             log = new StreamWriter(pathlog); 
             log.AutoFlush = true;
-            log.WriteLine("Segundo constructor");
             log.WriteLine("Archivo: "+nombre);
             log.WriteLine("Fecha: "+DateTime.Now);
 
