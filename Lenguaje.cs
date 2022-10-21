@@ -34,6 +34,8 @@ using System.Collections.Generic;
 //                       E) Hacer que funcione el do-while y el while
 //( ) Requerimiento 3.3- Agregar:
 //                       A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
+//                       B) Considerar el residuo de la division en ensamblador
+
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -65,6 +67,14 @@ namespace Semantica
             foreach (Variable v in variables)
             {
                 log.WriteLine(v.getNombre()+" "+v.getTipo()+" "+v.getValor());
+            }
+        }
+        private void variablesAsm()
+        {
+            asm.WriteLine(";Variables: ");
+            foreach (Variable v in variables)
+            {
+                asm.WriteLine("\t"+v.getNombre()+" DW ?");
             }
         }
         private bool existeVariable(string nombre)
@@ -132,6 +142,7 @@ namespace Semantica
             asm.WriteLine("ORG 100h");
             Libreria();
             Variables();
+            variablesAsm();
             Main();
             displayVariables();
             asm.WriteLine("RET");
@@ -321,6 +332,8 @@ namespace Semantica
                         if(evaluacion)
                         {
                             modVariable(nombre, resultado);
+                            //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
+                            asm.WriteLine("MOV " + nombre + ", AX");
                         }
                     }
                     else
@@ -436,14 +449,14 @@ namespace Semantica
             }while(validarFor);
         }
         //Incremento -> Identificador ++ | --
-        private bool Incremento(bool evaluacion)
+        private /*int*/bool Incremento(bool evaluacion/*,valor de la varialble a (b+=a)*/)
         {
             //string variable=getContenido();
             if(existeVariable(getContenido()))
             {
                 string variable = getContenido();
                 match(Tipos.Identificador);
-                
+                //switch(getContenido()){Case "++": return 1; Case "--": return -1; Case "+=": return getValor(variable)+1; Case "-=": return getValor(variable)-1; Case *=": return getValor(variable)*1; Case "/=": return getValor(variable)/1; Case "%=": return getValor(variable)%1; Case default: throw new Error("Error de sintaxis, no se reconoce el operador <" + getContenido() + "> en linea: " + linea, log);}
                 if(getContenido() == "++")
                 {
                     match("++");
@@ -657,9 +670,9 @@ namespace Semantica
                 Termino();
                 log.Write(operador + " ");
                 float n1 = stack.Pop();
-                asm.WriteLine("POP AX");
-                float n2 = stack.Pop();
                 asm.WriteLine("POP BX");
+                float n2 = stack.Pop();
+                asm.WriteLine("POP AX");
                 switch (operador)
                 {
                     case "+":
@@ -691,9 +704,9 @@ namespace Semantica
                 Factor();
                 log.Write(operador + " ");
                 float n1 = stack.Pop();
-                asm.WriteLine("POP AX");
-                float n2 = stack.Pop();
                 asm.WriteLine("POP BX");
+                float n2 = stack.Pop();
+                asm.WriteLine("POP AX");
                 //Requerimiento 3.1-A
                 //Guardar el residuo en caso de ser %
                 switch (operador)
@@ -707,6 +720,12 @@ namespace Semantica
                         stack.Push(n2 / n1);
                         asm.WriteLine("DIV BX");
                         asm.WriteLine("PUSH AX");
+                        break;
+                    //Requerimiento 3.3-B
+                    case "%":
+                        stack.Push(n2 % n1);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("PUSH DX");
                         break;
                 }
             }
