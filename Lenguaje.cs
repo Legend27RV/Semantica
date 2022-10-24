@@ -43,13 +43,14 @@ namespace Semantica
         List <Variable> variables = new List<Variable>();
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
+        int cIf;
         public Lenguaje()
         {
-
+            cIf = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-
+            cIf = 0;
         }
         ~Lenguaje()
         {
@@ -74,6 +75,7 @@ namespace Semantica
             asm.WriteLine(";Variables: ");
             foreach (Variable v in variables)
             {
+                //Hace un switch para poner a cada variable por su tipo de dato (char(1 byte), int(2 bytes), float(4 bytes))
                 asm.WriteLine("\t"+v.getNombre()+" DW ?");
             }
         }
@@ -556,6 +558,7 @@ namespace Semantica
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
         private void If(bool evaluacion)
         {
+            string etiquetaIf = "if" + ++cIf;
             match("if");
             match("(");
             //Requerimiento 2.4
@@ -589,6 +592,7 @@ namespace Semantica
                     Instruccion(!validaIf);
                 }
             }
+            asm.WriteLine(etiquetaIf+":");
         }
         //Printf -> printf(cadena|expresion);
         private void Printf(bool evaluacion)
