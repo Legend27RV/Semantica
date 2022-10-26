@@ -1,18 +1,13 @@
 Archivo: prueba.cpp
-Fecha: 25/10/2022 09:46:39 a. m.
-
-y = 61 = 61
-y 61 
+Fecha: 26/10/2022 10:23:03 a. m.
+1 1 
 x = 10 = 10
-Variables: 
-area Float 0
-radio Float 0
-pi Float 0
-resultado Float 0
-a Int 0
-d Int 0
-altura Int 0
-x Float 10
-y Char 61
-i Int 0
-j Int 0
+
+i = 0 = 0
+i x 
+j = 0 = 0
+j x 
+k = 0 = 0
+k x 
+l = 0 = 0
+l x Error de sintaxis, se espera un ( en linea: 20

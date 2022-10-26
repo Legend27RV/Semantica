@@ -21,7 +21,7 @@ using System.Collections.Generic;
 //(x) Requerimiento 2.6.- Ejecutar el for();
 
 //( ) Requerimiento 3.1- Actualizacion: 
-//                       A) Agregar el residuo de la division en PorFactor
+//                       A) Agregar el residuo (%) de la division en PorFactor
 //                       B) Agregar en Asignacion los incremetos de termino y factor
 //                       a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                       en donde el 1 puede ser cualquier expresion
@@ -35,6 +35,13 @@ using System.Collections.Generic;
 //( ) Requerimiento 3.3- Agregar:
 //                       A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
 //                       B) Considerar el residuo de la division en ensamblador
+//                       C) Programar el printf y scanf en ensamblador
+//( ) Requerimiento 3.4- 
+//                       A) Programar el else en ensamblador
+//                       B) Programar el for en ensamblador
+//() Requerimiento  3.5-
+//                       A) Programar el while en ensamblador
+//                       B) Programar el do-while en ensamblador
 
 namespace Semantica
 {
@@ -44,13 +51,14 @@ namespace Semantica
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
         int cIf;
+        int cFor;
         public Lenguaje()
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
         ~Lenguaje()
         {
@@ -393,6 +401,9 @@ namespace Semantica
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            string etiquetaInicioFor = "Iniciofor" + cFor;
+            string etiquetaFinFor = "Finfor" + cFor++;
+            asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
             Asignacion(evaluacion);
@@ -439,6 +450,7 @@ namespace Semantica
                     NextToken();
                 }
             }while(validarFor);
+            asm.WriteLine(etiquetaFinFor+":");
         }
         //Incremento -> Identificador ++ | --
         private /*int*/bool Incremento(bool evaluacion/*,valor de la varialble a (b+=a)*/)

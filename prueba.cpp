@@ -5,13 +5,25 @@
 float area, radio, pi, resultado;
 int a, d, altura;
 float x;
-char y;int i ;int j;
+char y;int i ;int j;int k;int l;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    
-    y=61;
-    if(y==61){
+    if(1==1)
+    {
         x=10;
+        for(i=0;i<x;i++)
+        {
+            for(j=0;j<x;j++)
+            {
+                for(k=0;k<x;k++)
+                {
+                    for(l=0;l<x;l++)
+                    {
+                        printf("Hola mundo");
+                    }
+                }
+            }
+        }
     }
     /*y=255;
     y++;
