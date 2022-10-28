@@ -155,6 +155,7 @@ namespace Semantica
             Main();
             displayVariables();
             asm.WriteLine("RET");
+            asm.WriteLine("DEFINE_SCAN_NUM");
             asm.WriteLine("END");
         }
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -610,10 +611,17 @@ namespace Semantica
             {
                 if(evaluacion)
                 {
+                    /*
+                    setContenido(getContenido().Replace("\"",""));
+                    setContenido(getContenido().Replace( "\\n","\n"));
+                    setContenido(getContenido().Replace( "\\t","\t"));
+                    Console.Write(getContenido());
+                    */
                     string nombre=getContenido().Replace( "\\n","\n");
                     nombre=nombre.Replace( "\\t","\t");
-                    Console.Write(nombre.Replace( "\"",""));
+                    Console.Write(getContenido().Replace("\"",""));
                 }
+                asm.WriteLine("PRINTN "+getContenido()+"");
                 match(Tipos.Cadena);
             }
             else
@@ -625,6 +633,7 @@ namespace Semantica
                 {
                     Console.Write(resultado);
                 }
+                //Requerimiento: imprimir el PRINTN para numeros con PRINT_NUM
             }
             match(")");
             match(";");
@@ -651,6 +660,8 @@ namespace Semantica
                     {
                         throw new Error("Error de sintaxis, el valor no es un numero <" +val+"> en linea: "+linea, log);
                     }
+                    asm.WriteLine("CALL SCAN_NUM");
+                    asm.WriteLine("MOV "+getContenido()+",CX");
                     float valorFloat=float.Parse(val);
                     modVariable(nombre,valorFloat);
                 }

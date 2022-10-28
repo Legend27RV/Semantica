@@ -8,23 +8,9 @@ float x;
 char y;int i ;int j;int k;int l;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    if(1==1)
-    {
-        x=10;
-        for(i=0;i<x;i++)
-        {
-            for(j=0;j<x;j++)
-            {
-                for(k=0;k<x;k++)
-                {
-                    for(l=0;l<x;l++)
-                    {
-                        printf("Hola mundo");
-                    }
-                }
-            }
-        }
-    }
+    
+    printf("Introduzca el radio del cilindro: ");
+    scanf("%f", &radio);
     /*y=255;
     y++;
     // ^ Debe generar error semantico

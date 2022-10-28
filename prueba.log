@@ -1,13 +1,16 @@
 Archivo: prueba.cpp
-Fecha: 26/10/2022 10:23:03 a. m.
-1 1 
-x = 10 = 10
-
-i = 0 = 0
-i x 
-j = 0 = 0
-j x 
-k = 0 = 0
-k x 
-l = 0 = 0
-l x Error de sintaxis, se espera un ( en linea: 20
+Fecha: 28/10/2022 09:36:45 a. m.
+Variables: 
+area Float 0
+radio Float 10
+pi Float 0
+resultado Float 0
+a Int 0
+d Int 0
+altura Int 0
+x Float 0
+y Char 0
+i Int 0
+j Int 0
+k Int 0
+l Int 0
