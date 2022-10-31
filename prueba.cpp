@@ -11,6 +11,7 @@ void main(){
     
     printf("Introduzca el radio del cilindro: ");
     scanf("%f", &radio);
+    y++;
     /*y=255;
     y++;
     // ^ Debe generar error semantico

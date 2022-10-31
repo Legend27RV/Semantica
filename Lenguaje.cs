@@ -21,27 +21,27 @@ using System.Collections.Generic;
 //(x) Requerimiento 2.6.- Ejecutar el for();
 
 //( ) Requerimiento 3.1- Actualizacion: 
-//                       A) Agregar el residuo (%) de la division en PorFactor
-//                       B) Agregar en Asignacion los incremetos de termino y factor
+//                       (X) A) Agregar el residuo (%) de la division en PorFactor
+//                       ( ) B) Agregar en Asignacion los incremetos de termino y factor
 //                       a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                       en donde el 1 puede ser cualquier expresion
-//                       C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
+//                       ( ) C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
 //                       #libreria especiaL? contenedor?
 //                       en la clase lexico
 //( ) Requerimiento 3.2- Actualizacion la Venganza xd:
-//                       C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
-//                       D) Considerar el inciso B y C para el for
-//                       E) Hacer que funcione el do-while y el while
+//                       ( ) C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
+//                       ( ) D) Considerar el inciso B y C para el for
+//                       ( ) E) Hacer que funcione el do-while y el while
 //( ) Requerimiento 3.3- Agregar:
-//                       A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
-//                       B) Considerar el residuo de la division en ensamblador
-//                       C) Programar el printf y scanf en ensamblador
+//                       ( ) A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
+//                       (X) B) Considerar el residuo de la division en ensamblador
+//                       ( ) C) Programar el printf y scanf en ensamblador
 //( ) Requerimiento 3.4- 
-//                       A) Programar el else en ensamblador
-//                       B) Programar el for en ensamblador
-//() Requerimiento  3.5-
-//                       A) Programar el while en ensamblador
-//                       B) Programar el do-while en ensamblador
+//                       ( ) A) Programar el else en ensamblador
+//                       ( ) B) Programar el for en ensamblador
+//( ) Requerimiento 3.5-
+//                       ( ) A) Programar el while en ensamblador
+//                       ( ) B) Programar el do-while en ensamblador
 
 namespace Semantica
 {
@@ -312,50 +312,55 @@ namespace Semantica
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion(bool evaluacion)
         {
-            if(existeVariable(getContenido()))
-            {
                 log.WriteLine();
                 log.Write(getContenido()+" = ");
                 string nombre = getContenido();
                 match(Tipos.Identificador);
                 dominante = Variable.TipoDato.Char;
+                float incremento;
                 if (getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
                 {
-                    //Requerimiemto 3.1-B
-                    //Requerimiemto 3.2-C
+                    //Requerimiento 3.1-B
+                    match(Tipos.Asignacion);
+                    incremento=Incremento(evaluacion);
+                    match(";");
+                    modVariable(nombre, incremento);
+                    //Requerimiento 3.2-C
                 }
                 else
                 {
-                    match(Tipos.Asignacion);
-                    Expresion();
-                    match(";");
-                    float resultado = stack.Pop();
-                    asm.WriteLine("POP AX");
-                    log.Write("= " + resultado);
-                    log.WriteLine();
-                    if (dominante < evaluaNumero(resultado))
+                    if(existeVariable(getContenido()))
                     {
-                        dominante = evaluaNumero(resultado);
-                    }
-                    if (dominante <= getTipo(nombre))
-                    {
-                        if(evaluacion)
+                        match(Tipos.Asignacion);
+                        Expresion();
+                        match(";");
+                        float resultado = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        log.Write("= " + resultado);
+                        log.WriteLine();
+                        if (dominante < evaluaNumero(resultado))
                         {
-                            modVariable(nombre, resultado);
+                            dominante = evaluaNumero(resultado);
                         }
+                        if (dominante <= getTipo(nombre))
+                        {
+                            if(evaluacion)
+                            {
+                                modVariable(nombre, resultado);
+                            }
+                        }
+                        else
+                        {
+                            throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
+                        }
+                        //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
+                        asm.WriteLine("MOV " + nombre + ", AX");
                     }
                     else
                     {
-                        throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
+                        throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
                     }
-                    //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
-                    asm.WriteLine("MOV " + nombre + ", AX");
                 }
-            }
-            else
-            {
-                throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
-            }
         }
         //While -> while(Condicion) bloque de instrucciones | instruccion
         private void While(bool evaluacion)
@@ -412,7 +417,8 @@ namespace Semantica
             int lineaInit = linea;
             int tamanio = getContenido().Length;
             string variable = getContenido();
-            bool validarFor,incremento;
+            bool validarFor;
+            float incremento;
             do
             {
                 validarFor = Condicion("");
@@ -434,16 +440,8 @@ namespace Semantica
                 }
                 if(validarFor)
                 {
-                    if(incremento)
-                    {
-                        modVariable(variable, getValor(variable) + 1/*en vez de 1 puede ser "incremento"*/);
-                        //Hacer que el incremento regrese un int y se modifique la variable con lo que regresa
-                        //No hay necesidad de usar el if(incremento)
-                    }
-                    else
-                    {
-                        modVariable(variable, getValor(variable) - 1);
-                    }
+                    modVariable(variable, incremento);
+                    
                     posicion = posisionInit-tamanio;
                     linea = lineaInit;
                     archivo.DiscardBufferedData();
@@ -454,31 +452,37 @@ namespace Semantica
             asm.WriteLine(etiquetaFinFor+":");
         }
         //Incremento -> Identificador ++ | --
-        private /*int*/bool Incremento(bool evaluacion/*,valor de la varialble a (b+=a)*/)
+        private float Incremento(bool evaluacion/*,valor de la varialble a (b+=a)*/)
         {
             //string variable=getContenido();
             if(existeVariable(getContenido()))
             {
                 string variable = getContenido();
                 match(Tipos.Identificador);
-                //switch(getContenido()){Case "++": return 1; Case "--": return -1; Case "+=": return getValor(variable)+1; Case "-=": return getValor(variable)-1; Case *=": return getValor(variable)*1; Case "/=": return getValor(variable)/1; Case "%=": return getValor(variable)%1; Case default: throw new Error("Error de sintaxis, no se reconoce el operador <" + getContenido() + "> en linea: " + linea, log);}
-                if(getContenido() == "++")
+                switch(getContenido())
                 {
-                    match("++");
-                    /*if(evaluacion)
-                    {   
-                        modVariable(variable,getValor(variable)+1);
-                    }*/
-                    return true;
-                }
-                else
-                {
-                    match("--");
-                    /*if(evaluacion)
-                    {
-                        modVariable(variable,getValor(variable)-1);
-                    }*/
-                    return false;
+                    case "++":
+                        match("++");
+                        return getValor(variable)+1; 
+                    case "--":
+                        match("--");
+                        return getValor(variable)-1; 
+                    case "+=":
+                        match("+=");
+                        return getValor(variable)+getValor(getContenido()); 
+                    case "-=":
+                        match("-=");
+                        return getValor(variable)-getValor(getContenido()); 
+                    case "*=":
+                        match("*=");
+                        return getValor(variable)*getValor(getContenido()); 
+                    case "/=":
+                        match("/=");
+                        return getValor(variable)/getValor(getContenido()); 
+                    case "%=":
+                        match("%=");
+                        return getValor(variable)%getValor(getContenido());
+                    default: throw new Error("Error de sintaxis, no se reconoce el operador <" + getContenido() + "> en linea: " + linea, log);
                 }
             }
             else
