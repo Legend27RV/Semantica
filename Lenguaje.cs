@@ -30,12 +30,12 @@ using System.Collections.Generic;
 //                       en la clase lexico
 //( ) Requerimiento 3.2- Actualizacion la Venganza xd:
 //                       ( ) C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
-//                       ( ) D) Considerar el inciso B y C para el for
-//                       ( ) E) Hacer que funcione el do-while y el while
+//                       ( ) D) Considerar el inciso 3.1-B y 3.2-C para el for
+//                       (X) E) Hacer que funcione el do-while y el while
 //( ) Requerimiento 3.3- Agregar:
 //                       ( ) A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
 //                       (X) B) Considerar el residuo de la division en ensamblador
-//                       ( ) C) Programar el printf y scanf en ensamblador
+//                       (X) C) Programar el printf y scanf en ensamblador
 //( ) Requerimiento 3.4- 
 //                       ( ) A) Programar el else en ensamblador
 //                       ( ) B) Programar el for en ensamblador
@@ -312,97 +312,147 @@ namespace Semantica
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion(bool evaluacion)
         {
+            if(existeVariable(getContenido()))
+            {
                 log.WriteLine();
                 log.Write(getContenido()+" = ");
                 string nombre = getContenido();
                 match(Tipos.Identificador);
                 dominante = Variable.TipoDato.Char;
-                float incremento;
                 if (getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
                 {
-                    //Requerimiento 3.1-B
-                    match(Tipos.Asignacion);
-                    incremento=Incremento(evaluacion);
-                    match(";");
-                    modVariable(nombre, incremento);
-                    //Requerimiento 3.2-C
-                }
-                else
-                {
-                    if(existeVariable(getContenido()))
+                    //Requerimiemto 3.1-B
+                    if (evaluacion)
                     {
-                        match(Tipos.Asignacion);
-                        Expresion();
-                        match(";");
-                        float resultado = stack.Pop();
-                        asm.WriteLine("POP AX");
-                        log.Write("= " + resultado);
-                        log.WriteLine();
-                        if (dominante < evaluaNumero(resultado))
+                        if (getTipo(nombre) == Variable.TipoDato.Int)
                         {
-                            dominante = evaluaNumero(resultado);
-                        }
-                        if (dominante <= getTipo(nombre))
-                        {
-                            if(evaluacion)
-                            {
-                                modVariable(nombre, resultado);
-                            }
+                            asm.WriteLine("INC " + nombre);
                         }
                         else
                         {
-                            throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
+                            throw new Error("Error de semantica, no se puede incrementar una variable de tipo float <" + nombre + "> en linea: " + linea, log);
                         }
-                        //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
-                        asm.WriteLine("MOV " + nombre + ", AX");
+                    }
+                    //Requerimiemto 3.2-C
+                    string aux=getContenido();
+                    switch(aux){
+                        case "++":
+                            match("++");
+                            modVariable(nombre, getValor(nombre) + 1);
+                            break;
+                        case "--":
+                            match("--");
+                            modVariable(nombre, getValor(nombre) - 1);
+                            break;
+                        default: throw new Error("Error de semantica, no se puede incrementar una variable de tipo float <" + nombre + "> en linea: " + linea, log);
+                        
+                    }
+                    match(";");
+                }
+                else
+                {
+                    match(Tipos.Asignacion);
+                    Expresion();
+                    match(";");
+                    float resultado = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    log.Write("= " + resultado);
+                    log.WriteLine();
+                    if (dominante < evaluaNumero(resultado))
+                    {
+                        dominante = evaluaNumero(resultado);
+                    }
+                    if (dominante <= getTipo(nombre))
+                    {
+                        if(evaluacion)
+                        {
+                            modVariable(nombre, resultado);
+                        }
                     }
                     else
                     {
-                        throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
+                        throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
                     }
+                    //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
+                    asm.WriteLine("MOV " + nombre + ", AX");
                 }
+            }
+            else
+            {
+                throw new Error("Error de sintaxis, variable no Existe <" +getContenido()+"> en linea: "+linea, log);
+            }
         }
         //While -> while(Condicion) bloque de instrucciones | instruccion
         private void While(bool evaluacion)
         {
             match("while");
-            match("(");
-            bool validarWhile = Condicion("");
-            if(!evaluacion)
+            int posisionInit = posicion;
+            int lineaInit = linea;
+            int tamanio = getContenido().Length;
+            string variable = getContenido();
+            bool validarWhile;
+            do
             {
-                validarWhile = false;
-            }
-            match(")");
-            if(getContenido() == "{") 
-            {
-                BloqueInstrucciones(validarWhile);
-            }
-            else
-            {
-                Instruccion(validarWhile);
-            }
+                match("(");
+                validarWhile = Condicion("");
+                if(!evaluacion)
+                {
+                    validarWhile = false;
+                }
+                match(")");
+                if(getContenido() == "{") 
+                {
+                    BloqueInstrucciones(validarWhile);
+                }
+                else
+                {
+                    Instruccion(validarWhile);
+                }
+                if (validarWhile)
+                {
+                    posicion = posisionInit;
+                    linea = lineaInit;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarWhile);
+                
         }
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion)
         {
             match("do");
-            if (getContenido() == "{")
-            {
-                BloqueInstrucciones(evaluacion);
-            }
-            else
-            {
-                Instruccion(evaluacion);
-            } 
-            match("while");
-            match("(");
-            bool validarDo = Condicion("");
-            if(!evaluacion)
-            {
-                validarDo = false;
-            }
-            match(")");
-            match(";");
+            int posisionInit = posicion;
+            int lineaInit = linea;
+            int tamanio = getContenido().Length;
+            string variable = getContenido();
+            bool validarDo;
+            do{
+                if (getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion);
+                }
+                else
+                {
+                    Instruccion(evaluacion);
+                } 
+                match("while");
+                match("(");
+                validarDo = Condicion("");
+                if(!evaluacion)
+                {
+                    validarDo = false;
+                }
+                match(")");
+                match(";");
+                if(validarDo)
+                {
+                    posicion = posisionInit-tamanio+1;
+                    linea = lineaInit;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarDo);
         }
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
@@ -441,15 +491,17 @@ namespace Semantica
                 if(validarFor)
                 {
                     modVariable(variable, incremento);
-                    
                     posicion = posisionInit-tamanio;
                     linea = lineaInit;
-                    archivo.DiscardBufferedData();
-                    archivo.BaseStream.Seek(posicion, SeekOrigin.Begin);
+                    setPosicion(posicion);
                     NextToken();
                 }
             }while(validarFor);
             asm.WriteLine(etiquetaFinFor+":");
+        }
+        private void setPosicion(int posicion){
+            archivo.DiscardBufferedData();
+            archivo.BaseStream.Seek(posicion, SeekOrigin.Begin);
         }
         //Incremento -> Identificador ++ | --
         private float Incremento(bool evaluacion/*,valor de la varialble a (b+=a)*/)
@@ -463,10 +515,10 @@ namespace Semantica
                 {
                     case "++":
                         match("++");
-                        return getValor(variable)+1; 
+                        return +1; 
                     case "--":
                         match("--");
-                        return getValor(variable)-1; 
+                        return -1; 
                     case "+=":
                         match("+=");
                         return getValor(variable)+getValor(getContenido()); 

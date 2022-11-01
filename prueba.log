@@ -1,4 +1,19 @@
 Archivo: prueba.cpp
-Fecha: 31/10/2022 09:58:12 a. m.
+Fecha: 01/11/2022 09:53:29 a. m.
 
-y = Error de sintaxis, se espera un Asignacion en linea: 14
+i = 1 = 1
+
+i = i i 1 Variables: 
+area Float 0
+radio Float 0
+pi Float 0
+resultado Float 0
+a Int 0
+d Int 0
+altura Int 0
+x Float 0
+y Char 0
+i Int 2
+j Int 0
+k Int 0
+l Int 0

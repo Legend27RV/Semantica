@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 31/10/2022 09:58:12 a. m.
+;Fecha: 01/11/2022 09:53:29 a. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -17,6 +17,18 @@ ORG 100h
 	j DW ?
 	k DW ?
 	l DW ?
-PRINTN "Introduzca el radio del cilindro: "
-CALL SCAN_NUM
-MOV radio,CX
+MOV AX,1
+PUSH AX
+POP AX
+MOV i, AX
+INC i
+POP AX
+MOV AX,1
+PUSH AX
+POP AX
+POP BX
+CMP AX,BX
+JGE 
+RET
+DEFINE_SCAN_NUM
+END
