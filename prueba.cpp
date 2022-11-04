@@ -8,12 +8,32 @@ float x;
 char y;char i ;int j;int k;int l;
 // Este programa calcula el volumen de un cilindro.
 void main(){
+    /*
+    printf("introduce la altura: s");
+    scanf("",&altura);
+    for(i = altura; i > 0; i-=2)
+        {
+    	j=0;
+            while(j < altura-i){
+                if(j%2 == 0){
+                    printf("*");
+                }
+                else{
+                    printf("-");
+                }
+                j+=1;
+            }
+            printf("\n");
+        }
+    */
+    
     x=10;
-    i=254;
+    i=152;
     do{
-        i+=2;
+        i%=3;
         printf(i);
-    }while(i<10);
+    }while(i<1);
+
     /*y=255;
     y++;
     // ^ Debe generar error semantico
