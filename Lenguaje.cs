@@ -22,15 +22,15 @@ using System.Collections.Generic;
 
 //( ) Requerimiento 3.1- Actualizacion: 
 //                       (X) A) Agregar el residuo (%) de la division en PorFactor
-//                       ( ) B) Agregar en Asignacion los incremetos de termino y factor
+//                       (1/2 - falta hacer que el 1 sea variable) B) Agregar en Asignacion los incremetos de termino y factor
 //                       a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                       en donde el 1 puede ser cualquier expresion
 //                       ( ) C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
 //                       #libreria especiaL? contenedor?
 //                       en la clase lexico
 //( ) Requerimiento 3.2- Actualizacion la Venganza xd:
-//                       ( ) C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
-//                       ( ) D) Considerar el inciso 3.1-B y 3.2-C para el for
+//                       (X) C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
+//                       (1/2 - falta hacer que el 1 sea variable) D) Considerar el inciso 3.1-B y 3.2-C para el for
 //                       (X) E) Hacer que funcione el do-while y el while
 //( ) Requerimiento 3.3- Agregar:
 //                       ( ) A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
@@ -321,33 +321,102 @@ namespace Semantica
                 dominante = Variable.TipoDato.Char;
                 if (getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
                 {
+                    bool posible = true;
+                    string aux = getContenido();
                     //Requerimiemto 3.1-B
-                    if (evaluacion)
+                    switch(getTipo(nombre))
                     {
-                        if (getTipo(nombre) == Variable.TipoDato.Int)
-                        {
-                            asm.WriteLine("INC " + nombre);
-                        }
-                        else
-                        {
-                            throw new Error("Error de semantica, no se puede incrementar una variable de tipo float <" + nombre + "> en linea: " + linea, log);
-                        }
-                    }
-                    //Requerimiemto 3.2-C
-                    string aux=getContenido();
-                    switch(aux){
-                        case "++":
-                            match("++");
-                            modVariable(nombre, getValor(nombre) + 1);
+                        case Variable.TipoDato.Char:
+                            if(getValor(nombre)>=255)
+                            {
+                                posible=false;    
+                            }
                             break;
-                        case "--":
-                            match("--");
-                            modVariable(nombre, getValor(nombre) - 1);
+                        case Variable.TipoDato.Int:
+                            if(getValor(nombre)>=65535)
+                            {
+                                posible=false;    
+                            }
                             break;
-                        default: throw new Error("Error de semantica, no se puede incrementar una variable de tipo float <" + nombre + "> en linea: " + linea, log);
-                        
+                        case Variable.TipoDato.Float:
+                            break;                    
                     }
-                    match(";");
+                    if(aux=="++"||aux=="--")
+                    {
+                        switch(aux)
+                        {
+                            case "++":
+                                match("++");
+                                if(posible)
+                                {
+                                    asm.WriteLine("INC " + nombre);
+                                    modVariable(nombre, getValor(nombre) + 1);
+                                }
+                                else
+                                {
+                                    throw new Error("No se puede aumentar la variable <" +nombre+ "> en linea: " + linea, log); 
+                                }
+                                break;
+                            case "--":
+                                match("--");
+                                asm.WriteLine("DEC " + nombre);
+                                modVariable(nombre, getValor(nombre) - 1);
+                                break;
+                        }
+                        match(";");
+                    }
+                    else
+                    {
+                        NextToken();
+                        Factor();
+                        float resultado = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        //Requerimiemto 3.2-C
+                        switch(aux){
+                            case "+=":
+                                if(posible)
+                                {
+                                    asm.WriteLine("ADD AX, " + nombre);
+                                    asm.WriteLine("MOV " + nombre + ", AX");
+                                    modVariable(nombre, getValor(nombre) + resultado);
+                                }
+                                else
+                                {
+                                    throw new Error("No se puede aumentar la variable <" +nombre+ "> en linea: " + linea, log); 
+                                }
+                                break;
+                            case "*=":
+                                if(posible)
+                                {
+                                    asm.WriteLine("MUL AX, " + nombre);
+                                    asm.WriteLine("MOV " + nombre + ", AX");
+                                    modVariable(nombre, getValor(nombre) * resultado);
+                                }
+                                else
+                                {
+                                    throw new Error("No se puede aumentar la variable <" +nombre+ "> en linea: " + linea, log); 
+                                }
+                                break;
+                            case "-=":
+                                asm.WriteLine("SUB AX, " + nombre);
+                                asm.WriteLine("MOV " + nombre + ", AX");
+                                modVariable(nombre, getValor(nombre) - resultado);
+                                break;
+                            case "/=":
+                                asm.WriteLine("DIV AX, " + nombre);
+                                asm.WriteLine("MOV " + nombre + ", AX");
+                                modVariable(nombre, getValor(nombre) / resultado);
+                                break;
+                            case "%=":
+                                asm.WriteLine("DIV AX, " + nombre);
+                                asm.WriteLine("MOV " + nombre + ", DX");
+                                modVariable(nombre, getValor(nombre) % resultado);
+                                break;
+                            default: 
+                                throw new Error("Error de semantica, no se conoce el operador <" +aux+ "> en linea: " + linea, log);
+                        }
+                        match(";");
+                    }
                 }
                 else
                 {
@@ -513,28 +582,49 @@ namespace Semantica
                 match(Tipos.Identificador);
                 switch(getContenido())
                 {
-                    case "++":
-                        match("++");
-                        return +1; 
                     case "--":
                         match("--");
-                        return -1; 
-                    case "+=":
-                        match("+=");
-                        return getValor(variable)+getValor(getContenido()); 
+                        return -1;
                     case "-=":
                         match("-=");
-                        return getValor(variable)-getValor(getContenido()); 
-                    case "*=":
-                        match("*=");
-                        return getValor(variable)*getValor(getContenido()); 
+                        return getValor(variable)-getValor(getContenido());
                     case "/=":
                         match("/=");
                         return getValor(variable)/getValor(getContenido()); 
                     case "%=":
                         match("%=");
                         return getValor(variable)%getValor(getContenido());
-                    default: throw new Error("Error de sintaxis, no se reconoce el operador <" + getContenido() + "> en linea: " + linea, log);
+                }
+                switch(getTipo(variable))
+                {
+                    case Variable.TipoDato.Char:
+                        if(getValor(variable)>=255){
+                            throw new Error("Error de semantica, la variable <" + variable + "> tipo <" + getTipo(variable) + "> sobrepasa el limite de 255 en linea: " + linea, log);
+                        }
+                        break;
+                    case Variable.TipoDato.Int:
+                        if(getValor(variable)>=65535){
+                            throw new Error("Error de semantica, la variable <" + variable + "> tipo <" + getTipo(variable) + "> sobrepasa el limite de 65535 en linea: " + linea, log);
+                        }
+                        break;
+                    case Variable.TipoDato.Float:
+                        break;                    
+                }
+                switch(getContenido())
+                {
+                    case "++":
+                        match("++");
+                        asm.WriteLine("INC " + variable);
+                        return 1; 
+                    case "+=":
+                        match("+=");
+                        return getValor(variable)+getValor(getContenido()); 
+                    case "*=":
+                        match("*=");
+                        return getValor(variable)*getValor(getContenido());
+                    default: 
+                        throw new Error("Error de sintaxis, no se reconoce el operador <" + getContenido() + "> en linea: " + linea, log);
+                 
                 }
             }
             else

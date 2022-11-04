@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 01/11/2022 09:53:29 a. m.
+;Fecha: 04/11/2022 09:13:55 a. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -17,13 +17,21 @@ ORG 100h
 	j DW ?
 	k DW ?
 	l DW ?
-MOV AX,1
+MOV AX,10
+PUSH AX
+POP AX
+MOV x, AX
+MOV AX,254
 PUSH AX
 POP AX
 MOV i, AX
-INC i
+MOV AX,2
+PUSH AX
 POP AX
-MOV AX,1
+ADD AX, i
+MOV i, AX
+POP AX
+MOV AX,10
 PUSH AX
 POP AX
 POP BX

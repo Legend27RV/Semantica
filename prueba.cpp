@@ -5,14 +5,15 @@
 float area, radio, pi, resultado;
 int a, d, altura;
 float x;
-char y;int i ;int j;int k;int l;
+char y;char i ;int j;int k;int l;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    i=1;
+    x=10;
+    i=254;
     do{
-        i++;
+        i+=2;
         printf(i);
-    }while(i<1);
+    }while(i<10);
     /*y=255;
     y++;
     // ^ Debe generar error semantico
