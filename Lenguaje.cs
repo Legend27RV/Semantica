@@ -20,28 +20,28 @@ using System.Collections.Generic;
 //(X) Requerimiento 2.5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 //(x) Requerimiento 2.6.- Ejecutar el for();
 
-//( ) Requerimiento 3.1- Actualizacion: 
+//(X) Requerimiento 3.1- Actualizacion: 
 //                       (X) A) Agregar el residuo (%) de la division en PorFactor
 //                       (X) B) Agregar en Asignacion los incremetos de termino y factor
 //                       a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                       en donde el 1 puede ser cualquier expresion
-//                       ( ) C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
+//                       (X) C) Programar el destructor para ejecutar el metodo cerrarArchivo (metodo cerrar de lexico)
 //                       #libreria especiaL? contenedor?
 //                       en la clase lexico
-//( ) Requerimiento 3.2- Actualizacion la Venganza xd:
+//(X) Requerimiento 3.2- Actualizacion la Venganza xd:
 //                       (X) C) Marcar errores semanticos cuando los incrementos de termino o factor superen el rango de la variable(char, int, float)
 //                       (X) D) Considerar el inciso 3.1-B y 3.2-C para el for
 //                       (X) E) Hacer que funcione el do-while y el while
-//( ) Requerimiento 3.3- Agregar:
+//(2/3) Requerimiento 3.3- Agregar:
 //                       ( ) A) Considerar las variables y los casteos de las expresiones matematicas en ensamblador (stack.push)
 //                       (X) B) Considerar el residuo de la division en ensamblador
 //                       (X) C) Programar el printf y scanf en ensamblador
 //( ) Requerimiento 3.4- 
 //                       ( ) A) Programar el else en ensamblador
-//                       ( ) B) Programar el for en ensamblador
+//                       (1/2) B) Programar el for en ensamblador
 //( ) Requerimiento 3.5-
-//                       ( ) A) Programar el while en ensamblador
-//                       ( ) B) Programar el do-while en ensamblador
+//                       (1/2) A) Programar el while en ensamblador
+//                       (1/2) B) Programar el do-while en ensamblador
 
 namespace Semantica
 {
@@ -52,9 +52,11 @@ namespace Semantica
         Variable.TipoDato dominante;
         int cIf;
         int cFor;
+        int cWhile;
+        int cDo;
         public Lenguaje()
         {
-            cIf = cFor = 0;
+            cIf = cFor = cWhile = cDo = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
@@ -84,7 +86,19 @@ namespace Semantica
             foreach (Variable v in variables)
             {
                 //Hace un switch para poner a cada variable por su tipo de dato (char(1 byte), int(2 bytes), float(4 bytes))
-                asm.WriteLine("\t"+v.getNombre()+" DW ?");
+                //asm.WriteLine("\t"+v.getNombre()+" DW ?");
+                switch (v.getTipo())
+                {
+                    case Variable.TipoDato.Char:
+                        asm.WriteLine("\t"+v.getNombre()+" DB "+v.getValor());
+                        break;
+                    case Variable.TipoDato.Int:
+                        asm.WriteLine("\t"+v.getNombre()+" DW "+v.getValor());
+                        break;
+                    case Variable.TipoDato.Float:
+                        asm.WriteLine("\t"+v.getNombre()+" DD "+v.getValor());
+                        break;
+                }
             }
         }
         private bool existeVariable(string nombre)
@@ -362,6 +376,9 @@ namespace Semantica
         //While -> while(Condicion) bloque de instrucciones | instruccion
         private void While(bool evaluacion)
         {
+            string etiquetaInicioWhile = "Iniciowhile" + cWhile;
+            string etiquetaFinWhile = "Finwhile" + cWhile++;
+            asm.WriteLine(etiquetaInicioWhile + ":");
             match("while");
             int posisionInit = posicion;
             int lineaInit = linea;
@@ -392,12 +409,17 @@ namespace Semantica
                     setPosicion(posicion);
                     NextToken();
                 }
+                asm.WriteLine("JMP " + etiquetaInicioWhile);
+                asm.WriteLine(etiquetaFinWhile+":");
             }while(validarWhile);
                 
         }
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion)
         {
+            string etiquetaInicioDo = "inicioDo" + cDo;
+            string etiquetaFinDo = "finDo" + cDo++;
+            asm.WriteLine(etiquetaInicioDo+":");
             match("do");
             int posisionInit = posicion;
             int lineaInit = linea;
@@ -412,7 +434,7 @@ namespace Semantica
                 else
                 {
                     Instruccion(evaluacion);
-                } 
+                }
                 match("while");
                 match("(");
                 validarDo = Condicion("");
@@ -424,16 +446,19 @@ namespace Semantica
                 match(";");
                 if(validarDo)
                 {
-                    posicion = posisionInit-tamanio+1;
+                    posicion = posisionInit-tamanio;
                     linea = lineaInit;
                     setPosicion(posicion);
                     NextToken();
                 }
+                asm.WriteLine("JMP " + etiquetaInicioDo);
+                asm.WriteLine(etiquetaFinDo+":");
             }while(validarDo);
         }
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            bool imprimeFor = true;
             string etiquetaInicioFor = "Iniciofor" + cFor;
             string etiquetaFinFor = "Finfor" + cFor++;
             asm.WriteLine(etiquetaInicioFor + ":");
@@ -666,6 +691,7 @@ namespace Semantica
         private void If(bool evaluacion)
         {
             string etiquetaIf = "if" + ++cIf;
+            string etiquetaElse = "else" + cIf;
             match("if");
             match("(");
             bool validaIf = Condicion(etiquetaIf);
@@ -684,6 +710,8 @@ namespace Semantica
             }
             if (getContenido() == "else")
             {
+                asm.WriteLine("JMP " + etiquetaElse);
+                asm.WriteLine(etiquetaIf + ":");
                 match("else");
                 if(evaluacion == false){
                     validaIf = true;
@@ -696,8 +724,9 @@ namespace Semantica
                 {
                     Instruccion(!validaIf);
                 }
+                asm.WriteLine(etiquetaElse + ":");
             }
-            asm.WriteLine(etiquetaIf+":");
+            asm.WriteLine(etiquetaIf + ":");
         }
         //Printf -> printf(cadena|expresion);
         private void Printf(bool evaluacion)
@@ -868,6 +897,7 @@ namespace Semantica
                     }
                     stack.Push(getValor(getContenido()));
                     //Requerimiento 3.3-A
+                    asm.WriteLine("PUSH AX");
                     match(Tipos.Identificador);
                 }
                 else
@@ -909,6 +939,7 @@ namespace Semantica
                     float dato = stack.Pop();
                     asm.WriteLine("POP AX");
                     stack.Push(convert(dato,casteo));
+                    asm.WriteLine("PUSH AX");
                 }
             }
         }

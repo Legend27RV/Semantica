@@ -8,6 +8,7 @@ namespace Semantica
         protected StreamReader archivo;
         protected StreamWriter log;
         protected StreamWriter asm;
+        private bool disposed;
         const int F = -1;
         const int E = -2;
         protected int linea, posicion;
@@ -366,6 +367,22 @@ namespace Semantica
         public bool FinArchivo()
         {
             return archivo.EndOfStream;
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+            }
+            disposed = true;
         }
     }
 }
