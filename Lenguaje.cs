@@ -153,7 +153,7 @@ namespace Semantica
 
                 case (Variable.TipoDato.Int):
                     return valor % 65535;
-
+                    
                 case (Variable.TipoDato.Float):
                     return valor;
             }
@@ -371,7 +371,7 @@ namespace Semantica
                     }
                     //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
                     if(impresion)
-                        asm.WriteLine("MOV " + nombre + ", AX");
+                        asm.WriteLine("MOV " + nombre + ", AX;juejue");
                 }
             }
             else
@@ -1024,7 +1024,7 @@ namespace Semantica
                     stack.Push(getValor(getContenido()));
                     //Requerimiento 3.3-A
                     if(impresion){
-                        asm.WriteLine("MOV AX," + getContenido());
+                        asm.WriteLine("MOV AX," + getContenido()+";ja");
                         asm.WriteLine("PUSH AX");
                     }
                     match(Tipos.Identificador);
@@ -1039,6 +1039,7 @@ namespace Semantica
             {
                 bool huboCasteo = false;
                 Variable.TipoDato casteo = Variable.TipoDato.Char;
+                string variable = getContenido();
                 match("(");
                 if(getClasificacion() == Tipos.TipoDato)
                 {
@@ -1071,7 +1072,7 @@ namespace Semantica
                     dato = convert(dato,casteo);
                     stack.Push(dato);
                     if(impresion){
-                        asm.WriteLine("MOV AX," + dato+";valo");
+                        asm.WriteLine("MOV AX," + dato);
                         asm.WriteLine("PUSH AX");
                     }
                 }

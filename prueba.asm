@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 09/11/2022 08:22:38 a. m.
+;Fecha: 09/11/2022 09:04:31 a. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -20,7 +20,7 @@ ORG 100h
 PRINT "Introduce la altura de la piramide: "
 CALL SCAN_NUM
 MOV altura,CX
-MOV AX,altura
+MOV AX,altura;ja
 PUSH AX
 MOV AX,2
 PUSH AX
@@ -28,12 +28,12 @@ POP BX
 POP AX
 CMP AX,BX
 JLE if1
-MOV AX,altura
+MOV AX,altura;ja
 PUSH AX
 POP AX
-MOV i, AX
+MOV i, AX;juejue
 Iniciofor0:
-MOV AX,i
+MOV AX,i;ja
 PUSH AX
 MOV AX,0
 PUSH AX
@@ -44,13 +44,13 @@ JLE Finfor0
 MOV AX,0
 PUSH AX
 POP AX
-MOV j, AX
+MOV j, AX;juejue
 Iniciowhile0:
-MOV AX,j
+MOV AX,j;ja
 PUSH AX
-MOV AX,altura
+MOV AX,altura;ja
 PUSH AX
-MOV AX,i
+MOV AX,i;ja
 PUSH AX
 POP BX
 POP AX
@@ -60,7 +60,7 @@ POP BX
 POP AX
 CMP AX,BX
 JGE Finwhile0
-MOV AX,j
+MOV AX,j;ja
 PUSH AX
 MOV AX,2
 PUSH AX
@@ -93,7 +93,7 @@ Finfor0:
 MOV AX,0
 PUSH AX
 POP AX
-MOV k, AX
+MOV k, AX;juejue
 inicioDo0:
 PRINT "-"
 MOV AX,2
@@ -101,9 +101,9 @@ PUSH AX
 POP AX
 ADD AX, k
 MOV k, AX
-MOV AX,k
+MOV AX,k;ja
 PUSH AX
-MOV AX,altura
+MOV AX,altura;ja
 PUSH AX
 MOV AX,2
 PUSH AX
@@ -147,22 +147,22 @@ if37:
 MOV AX,258
 PUSH AX
 POP AX
-MOV a, AX
+MOV a, AX;juejue
 PRINT "Valor de variable int a antes del casteo: "
-MOV AX,a
+MOV AX,a;ja
 PUSH AX
 POP AX
 CALL PRINT_NUM
-MOV AX,a
+MOV AX,a;ja
 PUSH AX
 POP AX
-MOV AX,2;valo
+MOV AX,2
 PUSH AX
 POP AX
-MOV y, AX
+MOV y, AX;juejue
 PRINTN ""
 PRINT "Valor de variable char y despues del casteo de a: "
-MOV AX,y
+MOV AX,y;ja
 PUSH AX
 POP AX
 CALL PRINT_NUM
