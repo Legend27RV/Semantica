@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 08/11/2022 09:55:13 p. m.
+;Fecha: 09/11/2022 08:22:38 a. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -17,7 +17,7 @@ ORG 100h
 	i DW 0
 	j DW 0
 	k DW 0
-PRINTN "Introduce la altura de la piramide: "
+PRINT "Introduce la altura de la piramide: "
 CALL SCAN_NUM
 MOV altura,CX
 MOV AX,altura
@@ -74,10 +74,10 @@ POP BX
 POP AX
 CMP AX,BX
 JNE if3
-PRINTN "*"
+PRINT "*"
 JMP else4
 if3:
-PRINTN "-"
+PRINT "-"
 else4:
 MOV AX,1
 PUSH AX
@@ -87,7 +87,7 @@ MOV j, AX
 JMP Iniciowhile0
 Finwhile0:
 PRINTN ""
-SUB i, 5
+SUB i, 1
 JMP Iniciofor0
 Finfor0:
 MOV AX,0
@@ -95,7 +95,7 @@ PUSH AX
 POP AX
 MOV k, AX
 inicioDo0:
-PRINTN "-"
+PRINT "-"
 MOV AX,2
 PUSH AX
 POP AX
@@ -120,7 +120,9 @@ finDo0:
 PRINTN ""
 JMP else2
 if1:
-PRINTN "Error: la altura debe de ser mayor que 2"
+PRINTN ""
+PRINTN ""
+PRINT "Error: la altura debe de ser mayor que 2"
 else2:
 MOV AX,1
 PUSH AX
@@ -129,8 +131,8 @@ PUSH AX
 POP BX
 POP AX
 CMP AX,BX
-JE if49
-PRINTN "Esto no se debe imprimir"
+JE if37
+PRINT "Esto no se debe imprimir"
 MOV AX,2
 PUSH AX
 MOV AX,2
@@ -138,15 +140,15 @@ PUSH AX
 POP BX
 POP AX
 CMP AX,BX
-JNE if51
-PRINTN "Esto tampoco"
-if51:
-if49:
+JNE if39
+PRINT "Esto tampoco"
+if39:
+if37:
 MOV AX,258
 PUSH AX
 POP AX
 MOV a, AX
-PRINTN "Valor de variable int a antes del casteo: "
+PRINT "Valor de variable int a antes del casteo: "
 MOV AX,a
 PUSH AX
 POP AX
@@ -158,12 +160,15 @@ MOV AX,2;valo
 PUSH AX
 POP AX
 MOV y, AX
-PRINTN "Valor de variable char y despues del casteo de a: "
+PRINTN ""
+PRINT "Valor de variable char y despues del casteo de a: "
 MOV AX,y
 PUSH AX
 POP AX
 CALL PRINT_NUM
-PRINTN "A continuacion se intenta asignar un int a un char sin usar casteo: "
+PRINTN ""
+PRINTN ""
+PRINT "A continuacion se intenta asignar un int a un char sin usar casteo: "
 RET
 DEFINE_PRINT_NUM
 DEFINE_PRINT_NUM_UNS

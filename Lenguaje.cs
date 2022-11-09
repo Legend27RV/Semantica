@@ -38,10 +38,10 @@ using System.Collections.Generic;
 //                       (X) C) Programar el printf y scanf en ensamblador
 //( ) Requerimiento 3.4- 
 //                       (X) A) Programar el else en ensamblador
-//                       (1/2) B) Programar el for en ensamblador
+//                       (X) B) Programar el for en ensamblador
 //( ) Requerimiento 3.5-
-//                       (1/2) A) Programar el while en ensamblador
-//                       (1/2) B) Programar el do-while en ensamblador
+//                       (X) A) Programar el while en ensamblador
+//                       (X) B) Programar el do-while en ensamblador
 
 namespace Semantica
 {
@@ -150,8 +150,10 @@ namespace Semantica
             {
                 case (Variable.TipoDato.Char):
                     return valor % 256;
+
                 case (Variable.TipoDato.Int):
                     return valor % 65535;
+
                 case (Variable.TipoDato.Float):
                     return valor;
             }
@@ -495,6 +497,7 @@ namespace Semantica
                 match(Tipos.Identificador);
                 string aux = getContenido();
                 incremento = Incremento(validarFor,variable,false);
+                float resultado = stack.Pop();
                 //Requerimiento 3.2-D
                 match(")");
                 if (getContenido() == "{")
@@ -516,19 +519,19 @@ namespace Semantica
                                 asm.WriteLine("DEC " + variable);
                                 break;
                             case "+=":
-                                asm.WriteLine("ADD " + variable + ", " + incremento);
+                                asm.WriteLine("ADD " + variable + ", " + resultado);
                                 break;
                             case "-=":
-                                asm.WriteLine("SUB " + variable + ", " + incremento);
+                                asm.WriteLine("SUB " + variable + ", " + resultado);
                                 break;
                             case "*=":
-                                asm.WriteLine("MUL " + variable + ", " + incremento);
+                                asm.WriteLine("MUL " + variable + ", " + resultado);
                                 break;
                             case "/=":
-                                asm.WriteLine("DIV " + variable + ", " + incremento);
+                                asm.WriteLine("DIV " + variable + ", " + resultado);
                                 break;
                             case "%=":
-                                asm.WriteLine("MOD " + variable + ", " + incremento);
+                                asm.WriteLine("MOD " + variable + ", " + resultado);
                                 break;
                         }
                     }
@@ -596,6 +599,7 @@ namespace Semantica
             NextToken();
             Factor(impresion);
             float resultado = stack.Pop();
+            stack.Push(resultado);
             if(impresion)
                 asm.WriteLine("POP AX");
             //Requerimiemto 3.2-C
@@ -812,6 +816,29 @@ namespace Semantica
             if(getClasificacion()==Tipos.Cadena)
             {
                 string nombre=getContenido();
+                char [] cadenas = new char[nombre.Length];
+                cadenas = nombre.ToCharArray();
+                if(nombre=="\"\\n\""){
+                    nombre=nombre.Replace( "\\t","\t");
+                    nombre=nombre.Replace( "\\n","");
+                    nombre=nombre.Replace( "\\'","");
+                    if(impresion)
+                        asm.WriteLine("PRINTN "+nombre+"");
+                }else{
+                    for(int i=0;i<nombre.Length;i++){
+                        if(cadenas[i]=='\\'){
+                            if(cadenas[i+1]=='n'){
+                            if(impresion)
+                                asm.WriteLine("PRINTN \"\"");
+                            }   
+                        }
+                    }
+                    nombre=nombre.Replace( "\\t","\t");
+                    nombre=nombre.Replace( "\\n","");
+                    nombre=nombre.Replace( "\\'","");
+                    if(impresion)
+                        asm.WriteLine("PRINT "+nombre+"");
+                }
                 if(evaluacion)
                 {
                     setContenido(getContenido().Replace("\"",""));
@@ -819,11 +846,8 @@ namespace Semantica
                     setContenido(getContenido().Replace( "\\t","\t"));
                     Console.Write(getContenido());
                 }
-                nombre=nombre.Replace( "\\t","\t");
-                nombre=nombre.Replace( "\\n","");
-                nombre=nombre.Replace( "\\'","");
-                if(impresion)
-                    asm.WriteLine("PRINTN "+nombre+"");
+                //if(impresion)
+                    //asm.WriteLine("PRINTN "+nombre+"");
                 match(Tipos.Cadena);
             }
             else
