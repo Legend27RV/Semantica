@@ -170,7 +170,7 @@ namespace Semantica
             variablesAsm();
             Main();
             displayVariables();
-            asm.WriteLine("RET");
+            asm.WriteLine("INT 20h");
             asm.WriteLine("DEFINE_PRINT_NUM");
             asm.WriteLine("DEFINE_PRINT_NUM_UNS");
             asm.WriteLine("DEFINE_SCAN_NUM");
@@ -350,8 +350,13 @@ namespace Semantica
                     Expresion(impresion);
                     match(";");
                     float resultado = stack.Pop();
-                    if(impresion)
+                    if(impresion){
                         asm.WriteLine("POP AX");
+                        if(getTipo(nombre) == Variable.TipoDato.Char)
+                            asm.WriteLine("MOV " + nombre + ", AL");
+                        else
+                            asm.WriteLine("MOV " + nombre + ", AX");
+                    }
                     log.Write("= " + resultado);
                     log.WriteLine();
                     if (dominante < evaluaNumero(resultado))
@@ -370,8 +375,10 @@ namespace Semantica
                         throw new Error("Error de semantica: no podemos asignar un: <" + dominante + "> a un <" + getTipo(nombre) + "> en linea  " + linea, log);
                     }
                     //Modifica la variable en ensamblador (Buscar como modificar/crear variables en ensamblador)
-                    if(impresion)
-                        asm.WriteLine("MOV " + nombre + ", AX;juejue");
+                    if(impresion){
+                        if(getTipo(nombre) == Variable.TipoDato.Int)
+                            asm.WriteLine("MOV AH, 0");
+                    }
                 }
             }
             else
@@ -1007,7 +1014,10 @@ namespace Semantica
                 }
                 stack.Push(float.Parse(getContenido()));
                 if(impresion){
-                    asm.WriteLine("MOV AX," + getContenido());
+                    if(dominante==Variable.TipoDato.Char)
+                        asm.WriteLine("MOV AL,"+getContenido());
+                    else
+                        asm.WriteLine("MOV AX," + getContenido());
                     asm.WriteLine("PUSH AX");
                 }
                 match(Tipos.Numero);
@@ -1024,7 +1034,10 @@ namespace Semantica
                     stack.Push(getValor(getContenido()));
                     //Requerimiento 3.3-A
                     if(impresion){
-                        asm.WriteLine("MOV AX," + getContenido()+";ja");
+                        if(dominante==Variable.TipoDato.Char)
+                            asm.WriteLine("MOV AL,"+getContenido());
+                        else
+                            asm.WriteLine("MOV AX," + getContenido());
                         asm.WriteLine("PUSH AX");
                     }
                     match(Tipos.Identificador);
@@ -1072,7 +1085,7 @@ namespace Semantica
                     dato = convert(dato,casteo);
                     stack.Push(dato);
                     if(impresion){
-                        asm.WriteLine("MOV AX," + dato);
+                        asm.WriteLine("MOV AH, 0");
                         asm.WriteLine("PUSH AX");
                     }
                 }
